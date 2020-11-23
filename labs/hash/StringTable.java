@@ -27,8 +27,13 @@ public class StringTable {
     {
     	this.nBuckets = nBuckets;
     	buckets = new LinkedList[nBuckets];
+    	size = 0;
 	
     	// TODO - fill in the rest of this method to initialize your table
+    	
+    	for(int i=0; i<nBuckets; i++) {
+    		buckets[i]= new LinkedList<Record>();
+    	}
     }
     
     
@@ -39,11 +44,22 @@ public class StringTable {
      * @return true if the insertion was successful, or false if a
      *         record with the same key is already present in the table.
      */
-    public boolean insert(Record r) 
-    {  
+    public boolean insert(Record r) {  
     	// TODO - implement this method
-	
-    	return false;
+    	
+    	String key = r.key;
+    	int hashCode = stringToHashCode(key);
+    	int index = toIndex(hashCode);
+    	LinkedList<Record> list = buckets[index];
+    	
+    	for(Record rec : list) {
+    		if(r.key.equals(rec.key)) {
+    			return false;
+    		}
+    	}
+    	list.add(r);
+    	size ++;
+    	return true;
     }
     
     
@@ -56,7 +72,16 @@ public class StringTable {
     public Record find(String key) 
     {
     	// TODO - implement this method
-	
+    	
+    	int hashCode = stringToHashCode(key);
+    	int index = toIndex(hashCode);
+    	LinkedList<Record> list = buckets[index];
+    	
+    	for(Record rec : list) {
+    		if(key.equals(rec.key)) {
+    			return rec;
+    		}
+    	}
     	return null;
     }
     
@@ -69,7 +94,17 @@ public class StringTable {
      */
     public void remove(String key) 
     {
-    	// TODO - implement this method
+    	int hashCode = stringToHashCode(key);
+    	int index = toIndex(hashCode);
+    	LinkedList<Record> list = buckets[index];
+    	
+    	for(Record rec : list) {
+    		if(key.equals(rec.key)) {
+    			list.remove(rec);
+    			size --;
+    			return;
+    		}
+    	}
     }
     
 
@@ -89,8 +124,9 @@ public class StringTable {
     private int toIndex(int hashcode)
     {
     	// Fill in your own hash function here
-	
-    	return 0;
+    	
+    	int loc = Math.abs((int)(nBuckets * ((hashcode * (((Math.sqrt(5)-1))/2) % 1.0))));
+    	return loc;
     }
     
     
